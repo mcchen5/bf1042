@@ -395,6 +395,235 @@ git remote set-url origin <正確的-repo-url>
 
 完成這一步後，再從 `main` 切出 `feat/v8-drizzle-neon`，開始做資料庫升級。
 
+### 建議做法：教學環境優先用 HTTPS，不先教 SSH
+
+若學生的環境有：
+
+1. Windows
+2. WSL
+3. VS Code
+4. GitHub Desktop
+
+通常最穩的起步方式不是 SSH，而是：
+
+- remote 用 `https://github.com/...`
+- 認證交給瀏覽器登入或 Git Credential Manager
+
+這樣的好處是：
+
+1. 比較接近多數學生日常使用情境
+2. 不必先理解 SSH key、public key、private key
+3. 在 Windows 與 VS Code 裡比較容易完成第一次 push
+
+### 第 1 步：確認 remote 使用 HTTPS URL
+
+在專案根目錄執行：
+
+```bash
+git remote -v
+```
+
+若看到像這樣，就代表目前是 HTTPS：
+
+```text
+origin  https://github.com/你的帳號/你的repo.git (fetch)
+origin  https://github.com/你的帳號/你的repo.git (push)
+```
+
+若看到的是 SSH：
+
+```text
+git@github.com:你的帳號/你的repo.git
+```
+
+請改回 HTTPS：
+
+```bash
+git remote set-url origin https://github.com/你的帳號/你的repo.git
+```
+
+例如本專案：
+
+```bash
+git remote set-url origin https://github.com/nschou/bf1042.git
+```
+
+再執行一次：
+
+```bash
+git remote -v
+```
+
+確認 fetch / push 都已經是 `https://github.com/...`。
+
+### 第 2 步：先確認本機 Git 身分
+
+建議先確認：
+
+```bash
+git config --global user.name
+git config --global user.email
+```
+
+若還沒設定，可補上：
+
+```bash
+git config --global user.name "你的名字"
+git config --global user.email "你的 GitHub Email"
+```
+
+這一步不是登入 GitHub，而是設定 commit 作者資訊。
+
+### 第 3 步：在 Windows 或 VS Code 先完成 GitHub 登入
+
+這一步的目的是讓本機之後執行 `git push` 時，可以透過已登入的 GitHub 身分完成授權。
+
+最常見的做法有兩種，擇一即可。
+
+#### 作法 A：在 VS Code 內登入 GitHub
+
+1. 打開 VS Code
+2. 點左下角帳號圖示，或 `Accounts`
+3. 選 `Sign in with GitHub`
+4. 瀏覽器會跳出 GitHub 授權頁
+5. 完成授權後回到 VS Code
+
+這個方式特別適合：
+
+1. 學生主要都在 VS Code 裡操作 source control
+2. 需要減少命令列認證細節
+
+#### 作法 B：在 Windows 安裝 Git for Windows，使用 Git Credential Manager
+
+若學生是在 Windows 本機或 WSL 開發，建議安裝：
+
+1. Git for Windows
+2. 安裝時保留 Git Credential Manager 相關選項
+
+安裝完成後，可確認：
+
+```bash
+git config --global credential.helper
+```
+
+常見正常值會類似：
+
+```text
+manager
+```
+
+或：
+
+```text
+manager-core
+```
+
+這代表之後第一次 `git push` 時，Git 會透過瀏覽器或視窗要求你登入 GitHub，登入成功後會把憑證安全保存起來。
+
+### 第 4 步：第一次 push
+
+當 remote 已是 HTTPS，且 VS Code / Windows 的 GitHub 登入已完成後，就可以在專案根目錄執行：
+
+```bash
+git push -u origin main
+```
+
+如果這是第一次 push，常見情況是：
+
+1. 會跳出瀏覽器登入 GitHub
+2. 或跳出 GitHub 授權視窗
+3. 或要求輸入 personal access token
+
+只要授權成功，之後同一台機器通常就不需要每次重複登入。
+
+若還有標記版號，也可一起推：
+
+```bash
+git push origin v7-baseline
+```
+
+若之後已從 `main` 切出 V8 分支，則再推分支：
+
+```bash
+git push -u origin feat/v8-drizzle-neon
+```
+
+### 第 5 步：若出現帳密相關錯誤
+
+若 `git push` 失敗，不要再嘗試輸入 GitHub 網站密碼。
+
+GitHub 的 HTTPS push 現在通常不接受帳號密碼直推，常見正確作法是：
+
+1. 用瀏覽器登入授權
+2. 用 Git Credential Manager
+3. 或使用 personal access token
+
+也就是說：
+
+- 不能把 GitHub 網站登入密碼直接當成 `git push` 密碼
+
+### 第 6 步：WSL 使用者的建議
+
+若學生在 WSL 裡開發，但希望認證流程簡單，最建議的方向是：
+
+1. Windows 先安裝 Git for Windows
+2. Windows 先完成 GitHub 登入
+3. WSL 內的 repo 也維持 HTTPS remote
+4. 盡量讓憑證管理走 Windows 那一套，而不是另外教一套 SSH
+
+教學上要先知道一件事：
+
+- WSL 與 Windows 雖然能一起工作，但不保證每台電腦都自動共用同一套 Git 憑證設定
+
+所以若學生在 WSL 仍 push 失敗，最穩的排查順序是：
+
+1. `git remote -v` 確認是不是 HTTPS
+2. `git config --global credential.helper` 確認有沒有 credential helper
+3. 在 Windows 版 VS Code 或 Windows terminal 先做一次 GitHub 登入
+4. 再回 WSL 重試 `git push`
+
+### 第 7 步：若一定要用 token
+
+若學校電腦、公司環境、或某些 WSL 設定導致瀏覽器授權不順，也可以改用 personal access token。
+
+做法是：
+
+1. 到 GitHub 建立 personal access token
+2. push 時輸入 GitHub username
+3. 密碼欄位不要填 GitHub 網站密碼
+4. 密碼欄位改貼 personal access token
+
+但教學上我不建議一開始就教 token，因為：
+
+1. 學生容易把 token 與密碼混淆
+2. 也比較容易誤存到不該存的地方
+
+### 常見排查
+
+1. remote 還是 SSH
+
+- 若 remote 是 `git@github.com:...`，就會走 SSH，不會走你想像中的 HTTPS 登入流程
+
+2. 把 GitHub 網站密碼直接拿來 push
+
+- 現在通常不行，要改用瀏覽器授權、credential manager 或 token
+
+3. Windows 跟 WSL 的 Git 設定不同步
+
+- 在 Windows 能 push，不代表在 WSL 內也一定已經設好
+
+4. VS Code 登入了，但 terminal 用的是另一套 Git
+
+- 要確認目前 push 的那個 terminal，實際使用的是哪一套 Git 與憑證設定
+
+5. credential helper 沒有啟用
+
+- 若沒有 helper，HTTPS push 常會卡在反覆登入或沒有地方保存憑證
+
+一句話總結：
+
+- 若教學目標是讓 Windows / WSL / VS Code 使用者先穩定 push，優先教 HTTPS + 瀏覽器登入 / Credential Manager，通常比先教 SSH 更適合
+
 ### 這次實作建議的最小指令
 
 ```bash
