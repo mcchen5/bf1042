@@ -5,53 +5,64 @@
 
 ---
 
+## 0. 先看教學路線（重要）
+
+目前教材採雙路線：
+
+1. 歷史對照線：`舊 V7 -> 舊 V8`
+2. 正式主線：`新 V7 -> 新 V8 -> 新 V9`
+
+補充：舊 V9 規劃已捨棄，不再作為課程目標。
+
+---
+
 ## 1. 主線閱讀順序
 
 若是第一次閱讀這組教材，建議依序閱讀：
 
-1. [00\_專案迭代講義.md](/root/00_nsPrj/01_backEnd/06_elysia/00_demo01/00_teaching/00_專案迭代講義.md:1)
-   用來理解整個專案從 V1 到 V9 的版本脈絡與演進理由。
+1. [00\_專案迭代講義.md](00_專案迭代講義.md)
+   先建立整體版本脈絡，包含雙路線定位（舊線對照 + 新主線）。
 
-2. [01\_版本閱讀指南.md](/root/00_nsPrj/01_backEnd/06_elysia/00_demo01/00_teaching/01_版本閱讀指南.md:1)
+2. [01\_版本閱讀指南.md](01_版本閱讀指南.md)
    用來理解這個專案如何對照不同版本快照檔，避免讀 code 時迷路。
 
-3. [01\_前端分離開發、整合進後端的作法.md](/root/00_nsPrj/01_backEnd/06_elysia/00_demo01/00_teaching/01_前端分離開發、整合進後端的作法.md:1)
+3. [01\_前端分離開發、整合進後端的作法.md](01_前端分離開發、整合進後端的作法.md)
    用來理解本專案目前的前後端開發與部署方式。
 
-4. [02_0_API contract truth 的重要性與實作方式.md](/root/00_nsPrj/01_backEnd/06_elysia/00_demo01/00_teaching/02_0_API contract truth 的重要性與實作方式.md:1)
+4. [04*2*新舊V7*設計詳解*為什麼做什麼怎麼做.md](04_2_新舊V7_設計詳解_為什麼做什麼怎麼做.md)
+   先補齊「為什麼要從舊 V7 重建到新 V7」的架構背景，再進主線實作會更清楚。
+
+5. [02_0_API contract truth 的重要性與實作方式.md](02_0_API contract truth 的重要性與實作方式.md)
    進入 API contract 主題，理解為什麼要先固定 API 邊界。
 
-5. [02_1_從目前 backend.ts 補齊 Elysia route schema 的實作步驟清單.md](/root/00*nsPrj/01_backEnd/06_elysia/00_demo01/00_teaching/02_1*從目前 backend.ts 補齊 Elysia route schema 的實作步驟清單.md:1)
+6. [02_1_從目前 backend.ts 補齊 Elysia route schema 的實作步驟清單.md](02*1*從目前 backend.ts 補齊 Elysia route schema 的實作步驟清單.md)
    把 API contract truth 真正落到 route schema。
 
-6. [02_2_導入 OpenAPI ／ Swagger 輸出.md](/root/00*nsPrj/01_backEnd/06_elysia/00_demo01/00_teaching/02_2*導入 OpenAPI ／ Swagger 輸出.md:1)
+7. [02_2_導入 OpenAPI ／ Swagger 輸出.md](02*2*導入 OpenAPI ／ Swagger 輸出.md)
    把 route schema 輸出成可閱讀、可驗證的 API 文件。
 
-7. [02*3_V7_Render*首次部署教案手冊.md](/root/00_nsPrj/01_backEnd/06_elysia/00_demo01/00_teaching/02_3_V7_Render_首次部署教案手冊.md:1)
+8. [02*3_V7_Render*首次部署教案手冊.md](02_3_V7_Render_首次部署教案手冊.md)
    在 V7 結尾先完成第一次 Render 部署，建立平台操作感與驗證習慣。
 
-8. [03_為什麼這個專案選 Drizzle + Neon.md](/root/00*nsPrj/01_backEnd/06_elysia/00_demo01/00_teaching/03*為什麼這個專案選 Drizzle + Neon.md:1)
+9. [03_為什麼這個專案選 Drizzle + Neon.md](03\_為什麼這個專案選 Drizzle + Neon.md)
    說明為什麼資料層升級選擇 `Drizzle + Neon`。
 
-9. [03*1_Drizzle+Neon*註冊與升級實作步驟清單.md](/root/00_nsPrj/01_backEnd/06_elysia/00_demo01/00_teaching/03_1_Drizzle+Neon_註冊與升級實作步驟清單.md:1)
-   正式進入 V8 的資料庫升級實作。
+10. [03*1_Drizzle+Neon*註冊與升級實作步驟清單.md](03_1_Drizzle+Neon_註冊與升級實作步驟清單.md)
+    正式進入新 V8 的資料庫升級實作。
 
-10. [03*2_V8*合併主線與*Render*最小部署*CI_CD*教案手冊.md](/root/00_nsPrj/01_backEnd/06_elysia/00_demo01/00_teaching/03_2_V8_合併主線與_Render_最小部署_CI_CD_教案手冊.md:1)
-    在 V8 完成後，補講「相對 V7 多了哪些部署調整」，並建立 V8 的主線治理與 CI/CD。
+11. [03*2_V8*合併主線與*Render*最小部署*CI_CD*教案手冊.md](03_2_V8_合併主線與_Render_最小部署_CI_CD_教案手冊.md)
+    在新 V8 完成後，補講「相對新 V7 多了哪些部署調整」，並建立主線治理與 CI/CD。
 
-11. [03*3_GitHub_PR*模板與審查清單.md](/root/00_nsPrj/01_backEnd/06_elysia/00_demo01/00_teaching/03_3_GitHub_PR_模板與審查清單.md:1)
+12. [03*3_GitHub_PR*模板與審查清單.md](03_3_GitHub_PR_模板與審查清單.md)
     提供課堂可直接套用的 PR 描述格式與審查流程。
 
-12. [03*4_V8*合併與部署\_課堂評分Rubric.md](/root/00_nsPrj/01_backEnd/06_elysia/00_demo01/00_teaching/03_4_V8_合併與部署_課堂評分Rubric.md:1)
+13. [03*4_V8*合併與部署\_課堂評分Rubric.md](03_4_V8_合併與部署_課堂評分Rubric.md)
     提供助教評分標準，讓流程能力與 V8 的部署調整結果都可量化評估。
 
-13. [04_Elysia + Better Auth + Google provider 實作步驟清單.md](/root/00_nsPrj/01_backEnd/06_elysia/00_demo01/00_teaching/04_Elysia + Better Auth + Google provider 實作步驟清單.md:1)
-    當 V8 完成後，再進入 V9 的 auth 升級；完成後也應再補一次本版部署調整。
+14. [04_Elysia + Better Auth + Google provider 實作步驟清單.md](04_Elysia + Better Auth + Google provider 實作步驟清單.md)
+    當新 V8 完成後，再進入新 V9 的 auth 升級；完成後也應再補一次本版部署調整。
 
-14. [04*2*新舊V7*設計詳解*為什麼做什麼怎麼做.md](/root/00_nsPrj/01_backEnd/06_elysia/00_demo01/00_teaching/04_2_新舊V7_設計詳解_為什麼做什麼怎麼做.md:1)
-    對照舊 V7 與新 V7 的設計動機、責任切分與實作步驟，作為升級到 V8/V9 前的架構補課。
-
-15. [04*3*舊V8*namespace改造*為什麼做什麼怎麼做.md](/root/00_nsPrj/01_backEnd/06_elysia/00_demo01/00_teaching/04_3_舊V8_namespace改造_為什麼做什麼怎麼做.md:1)
+15. [04*3*舊V8*namespace改造*為什麼做什麼怎麼做.md](04_3_舊V8_namespace改造_為什麼做什麼怎麼做.md)
     說明舊 V8 在 PostgreSQL schema（namespace）隔離下如何恢復可運作，包含設計動機、改造內容與實作流程。
 
 ---
@@ -60,17 +71,17 @@
 
 以下文件偏向特定版本或特定問題的補充說明：
 
-- [90*V3_normalizeMenuItem*相容舊資料說明.md](/root/00_nsPrj/01_backEnd/06_elysia/00_demo01/00_teaching/90_V3_normalizeMenuItem_相容舊資料說明.md:1)
+- [90*V3_normalizeMenuItem*相容舊資料說明.md](90_V3_normalizeMenuItem_相容舊資料說明.md)
   補充 V3 中 `normalizeMenuItem()` 的相容舊資料設計。
 
-- [91*V5_V6*差異與決策說明.md](/root/00_nsPrj/01_backEnd/06_elysia/00_demo01/00_teaching/91_V5_V6_差異與決策說明.md:1)
+- [91*V5_V6*差異與決策說明.md](91_V5_V6_差異與決策說明.md)
   補充 V5 與 V6 的差異與教學決策邏輯。
 
 ---
 
 ## 3. 封存與導向
 
-- [02_2_導入 OpenAPI ／ Swagger 輸出_01.md](/root/00*nsPrj/01_backEnd/06_elysia/00_demo01/00_teaching/02_2*導入 OpenAPI ／ Swagger 輸出*01.md:1)
+- [02_2_導入 OpenAPI ／ Swagger 輸出_01.md](02*2*導入 OpenAPI ／ Swagger 輸出*01.md)
   這是舊副本保留用的封存導向頁，正式內容請以 `02_2*導入 OpenAPI ／ Swagger 輸出.md` 為準。
 
 ---
