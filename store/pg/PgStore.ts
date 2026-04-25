@@ -35,17 +35,6 @@ interface SeedData {
   }>;
 }
 
-// userId 邊界轉換：
-//   Store 介面（來自 shared/contracts.ts）= string
-//   DB user_id = integer
-function toDbUserId(userId: string): number {
-  return parseInt(userId, 10);
-}
-
-function toStringUserId(dbUserId: number): string {
-  return String(dbUserId).padStart(4, "0");
-}
-
 function calculateTotal(items: ReadonlyArray<OrderItem>): number {
   return items.reduce((sum, oi) => sum + oi.item.price * oi.qty, 0);
 }
@@ -192,11 +181,10 @@ export class PgStore implements Store {
 
   async createOrder(input: { userId: string }): Promise<Order> {
     const createdAt = new Date();
-    const dbUserId = toDbUserId(input.userId);
 
     const [inserted] = await db
       .insert(ordersTable)
-      .values({ userId: dbUserId, status: "pending", total: 0, createdAt })
+      .values({ userId: input.userId, status: "pending", total: 0, createdAt })
       .returning();
 
     if (!inserted) throw new Error("Failed to create order");
@@ -347,7 +335,7 @@ export class PgStore implements Store {
     if (users.length > 0) {
       await db.insert(usersTable).values(
         users.map((u) => ({
-          id: parseInt(u.id, 10),
+          id: u.id,
           email: u.email,
           name: u.name,
           password: u.password,
@@ -369,14 +357,9 @@ export class PgStore implements Store {
     }
 
     for (const order of orders) {
-      const dbUserId =
-        typeof order.userId === "number"
-          ? order.userId
-          : parseInt(String(order.userId), 10);
-
       await db.insert(ordersTable).values({
         id: order.id,
-        userId: dbUserId,
+        userId: String(order.userId),
         total: order.total,
         status: order.status,
         createdAt: new Date(order.createdAt),
@@ -400,11 +383,7 @@ export class PgStore implements Store {
     }
 
     const schema = process.env.PG_SCHEMA ?? "public";
-    await db.execute(
-      sql.raw(
-        `select setval('${schema}.users_id_seq', coalesce((select max(id) from ${schema}.users), 1), true)`,
-      ),
-    );
+    // 只重置有 sequence 的表（users.id 是 text，無 sequence）
     await db.execute(
       sql.raw(
         `select setval('${schema}.menu_items_id_seq', coalesce((select max(id) from ${schema}.menu_items), 1), true)`,
@@ -466,7 +445,7 @@ export class PgStore implements Store {
 
     this.orders = orderRows.map((row) => ({
       id: row.id,
-      userId: toStringUserId(row.userId),
+      userId: row.userId,
       items: itemsByOrderId.get(row.id) ?? [],
       total: row.total,
       status: row.status === "submitted" ? "submitted" : "pending",

@@ -4,13 +4,6 @@ import type { Auth, LoginErrorCode } from "../Auth.ts";
 import { db } from "../../db/client.ts";
 import { usersTable } from "../../db/schema.ts";
 
-// userId 邊界轉換：
-//   Auth 介面（來自 shared/contracts.ts）SessionUser.id = string
-//   DB user.id = integer
-function toStringUserId(dbUserId: number): string {
-  return String(dbUserId).padStart(4, "0");
-}
-
 interface CachedUser {
   id: string; // string 版，對齊 SessionUser.id
   email: string;
@@ -27,7 +20,7 @@ export class PgAuth implements Auth {
     const rows = await db.select().from(usersTable).orderBy(asc(usersTable.id));
 
     this.users = rows.map((row) => ({
-      id: toStringUserId(row.id),
+      id: row.id,
       email: row.email,
       name: row.name,
       password: row.password,

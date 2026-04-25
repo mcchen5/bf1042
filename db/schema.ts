@@ -16,9 +16,13 @@ const appSchema = pgSchema(process.env.PG_SCHEMA ?? "public");
 //   MenuItem { id, name, price, category, description, image_url }
 //   Order { id, userId: string, total, status, createdAt, submittedAt }
 //   OrderItem { item: MenuItem, qty }  → order_items（反正規化）
+//
+// 關鍵設計原則：userId 型別在 contracts.ts 中定義為 string，
+// DB schema 應該完全遵循這個事實，不做型別轉換。
+// 這樣避免隱性轉換成本，也支援 UUID 等其他 userId 格式。
 
 export const usersTable = appSchema.table("users", {
-  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  id: text("id").primaryKey(),
   email: text("email").notNull().unique(),
   name: text("name").notNull(),
   password: text("password").notNull(),
@@ -35,7 +39,7 @@ export const menuItemsTable = appSchema.table("menu_items", {
 
 export const ordersTable = appSchema.table("orders", {
   id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-  userId: integer("user_id")
+  userId: text("user_id")
     .notNull()
     .references(() => usersTable.id),
   total: integer("total").notNull().default(0),
