@@ -312,35 +312,70 @@ export default function App() {
         throw new Error("Please login first");
       }
 
+      const patchOrderItem = async (
+        targetOrderId: number,
+        qty: number,
+      ): Promise<Order> => {
+        const response = await fetch(
+          buildApiUrl(`/api/orders/${targetOrderId}`),
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              userId: user.id,
+              itemId: item.id,
+              qty,
+            }),
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error(`Update order failed: HTTP ${response.status}`);
+        }
+
+        const payload = (await response.json()) as ApiDataResponse<Order>;
+        const updatedOrder = payload?.data;
+
+        if (!updatedOrder) {
+          throw new Error("Update order failed: invalid payload");
+        }
+
+        return updatedOrder;
+      };
+
       const targetOrderId = await ensureOrder();
       const currentQty = cartQtyByItemId[item.id] ?? 0;
       const nextQty = currentQty + 1;
 
-      const response = await fetch(
-        buildApiUrl(`/api/orders/${targetOrderId}`),
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId: user.id,
-            itemId: item.id,
-            qty: nextQty,
-          }),
-        },
-      );
+      try {
+        const updatedOrder = await patchOrderItem(targetOrderId, nextQty);
+        syncCartFromOrder(updatedOrder);
+      } catch (firstTryError) {
+        const firstTryMessage =
+          firstTryError instanceof Error ? firstTryError.message : "";
 
-      if (!response.ok) {
-        throw new Error(`Update order failed: HTTP ${response.status}`);
+        // 換帳號或舊訂單失效時，重新同步目前使用者訂單後再重試一次。
+        if (
+          firstTryMessage.includes("HTTP 403") ||
+          firstTryMessage.includes("HTTP 404")
+        ) {
+          setOrderId(null);
+
+          const recoveredOrder = await loadCurrentOrder(user.id);
+          const retryOrderId = recoveredOrder?.id ?? (await ensureOrder());
+          const recoveredQty =
+            recoveredOrder?.items.find(
+              (orderItem) => orderItem.item.id === item.id,
+            )?.qty ?? 0;
+          const retryQty = recoveredQty + 1;
+
+          const retriedOrder = await patchOrderItem(retryOrderId, retryQty);
+          syncCartFromOrder(retriedOrder);
+          return;
+        }
+
+        throw firstTryError;
       }
-
-      const payload = (await response.json()) as ApiDataResponse<Order>;
-      const updatedOrder = payload?.data;
-
-      if (!updatedOrder) {
-        throw new Error("Update order failed: invalid payload");
-      }
-
-      syncCartFromOrder(updatedOrder);
     } catch (cartError) {
       if (
         cartError instanceof Error &&
